@@ -1,39 +1,9 @@
-// 1. Importar Express
 const express = require('express');
-
-// 2. Criar aplicação
 const app = express();
 
-// 3. Definir porta
-const PORT = 5000;
-
-// 4. Middleware para JSON
 app.use(express.json());
 
-
-// 5. Criar primeiro endpoint
-app.get('/', (req, res) => {
-    res.json({
-        mensagem: '🎉 Minha primeira API funcionando!',
-        status: 'sucesso',
-        timestamp: new Date().toISOString(),
-    });
-});
-
-// 6. Endpoint de informações
-app.get('/info', (req, res) => {
-    res.json({
-        nome: 'Minha API REST de CONTEÚDOS',
-        versao: '1.0.0',
-        autor: 'Davi Massakatsu'
-    });
-});
-
-// 7. Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-});
-// Banco de dados "fake" em memória
+// Dados em memória
 let conteudos = [
   {
     id: 1,
@@ -48,7 +18,7 @@ let conteudos = [
     titulo: "Breaking Bad",
     diretor: "Vince Gilligan",
     ano: 2008,
-    genero: "Drama/Crime",
+    genero: "Drama",
     nota: 9.5
   },
   {
@@ -56,7 +26,7 @@ let conteudos = [
     titulo: "Better Call Saul",
     diretor: "Vince Gilligan",
     ano: 2015,
-    genero: "Drama/Crime",
+    genero: "Drama",
     nota: 9.0
   },
   {
@@ -80,7 +50,7 @@ let conteudos = [
     titulo: "El Camino: A Breaking Bad Movie",
     diretor: "Vince Gilligan",
     ano: 2019,
-    genero: "Drama/Crime",
+    genero: "Drama",
     nota: 7.3
   },
   {
@@ -96,7 +66,7 @@ let conteudos = [
     titulo: "Ozark",
     diretor: "Bill Dubuque",
     ano: 2017,
-    genero: "Drama/Crime",
+    genero: "Drama",
     nota: 8.5
   },
   {
@@ -112,126 +82,55 @@ let conteudos = [
     titulo: "Weeds",
     diretor: "Jenji Kohan",
     ano: 2005,
-    genero: "Drama/Comédia",
+    genero: "Drama",
     nota: 7.9
   }
 ];
-        
-// POST
-app.post('/api/conteudos', (req, res) => {
-  console.log('POST:', req.body);
-  produtos.push(req.body);
-  res.json(conteudos);
-});
 
-// GET /api/conteudos - Listar todos
-app.get('/api/conteudos', (req, res) => {
-    // Retorna o array completo
-    res.json(conteudos);
-});
-
-
-// GET /api/conteudos/:id - Buscar por ID
+// GET /api/produtos/:id - Buscar por ID
 app.get('/api/conteudos/:id', (req, res) => {
-    // 1. Pegar ID da URL
-    const id = parseInt(req.params.id);
-    
-    // 2. Buscar produto no array
-    const conteudos = conteudos.find(p => p.id === id);
-    
-    // 3. Verificar se encontrou
-    if (!conteudos) {
-        return res.status(404).json({ 
-            erro: "Conteudo não encontrado" 
-        });
+    const conteudo = conteudos.find(c => c.id === parseInt(req.params.id));
+
+    if (!conteudo) {
+        return res.status(404).json({ erro: "Conteúdo não encontrado" });
     }
-    
-    // 4. Retornar produto encontrado
-    res.json(conteudos);
+
+    res.json(conteudo);
 });
 
-
-// GET /api/produtos?ordem=preco&direcao=asc
+// GET /api/produtos - Listar com filtros, ordenação e paginação
 app.get('/api/conteudos', (req, res) => {
-    const { categoria, genero, nota, ordem, direcao } = req.query;
+    const { categoria, ano_max, ano_min, nota_min, nota_max, ordem, direcao, pagina = 1, limite = 10 } = req.query;
     
-    let resultado = produtos;
+    let resultado = conteudos;
     
-    // ... filtros anteriores ...
+    // Filtros
+    if (categoria) resultado = resultado.filter(p => p.genero === categoria);
+    if (ano_max) resultado = resultado.filter(p => p.ano <= parseFloat(ano_max));
+    if (ano_min) resultado = resultado.filter(p => p.ano >= parseFloat(ano_min));
+    if (nota_min) resultado = resultado.filter(p => p.nota >= parseFloat(nota_min));
+    if (nota_max) resultado = resultado.filter(p => p.nota <= parseFloat(nota_max));
     
     // Ordenação
-    if (ordem) {
+  if (ordem) {
         resultado = resultado.sort((a, b) => {
             if (ordem === 'ano') {
-                // Ordenar por ano
-                return direcao === 'desc' 
-                    ? b.preco - a.preco  // Decrescente
-                    : a.preco - b.preco; // Crescente
+                return direcao === 'desc' ? b.ano - a.ano : a.ano - b.ano;
             }
-            
-            if (ordem === 'titulo') {
-                // Ordenar por nome (alfabético)
+            if (ordem === 'nota') {
                 return direcao === 'desc'
-                    ? b.nome.localeCompare(a.nome)
-                    : a.nome.localeCompare(b.nome);
+                    ? b.titulo.localeCompare(a.titulo)
+                    : a.titulo.localeCompare(b.titulo);
             }
         });
     }
-    
-    res.json(resultado);
-});
-
-// GET /api/conteudos?categoria
-app.get('/api/conteudos', (req, res) => {
-    // 1. Pegar query parameters
-    const { categoria, ano_max, ano_min } = req.query;
-    
-    // 2. Começar com todos os produtos
-    let resultado = conteudos;
-    
-    // 3. Aplicar filtro de categoria (se fornecido)
-    if (categoria) {
-        resultado = resultado.filter(p => p.categoria === categoria);
-    }
-    
-    // 4. Aplicar filtro de preço máximo
-    if (ano_max) {
-        resultado = resultado.filter(p => p.ano <= parseFloat(ano_max));
-    }
-    
-    // 5. Aplicar filtro de preço mínimo
-    if (ano_min) {
-        resultado = resultado.filter(p => p.ano >= parseFloat(ano_min));
-    }
-    
-    // 6. Retornar resultados filtrados
-    res.json(resultado);
-});
-
-
-// GET /api/produtos?pagina=1&limite=2
-app.get('/api/conteudos', (req, res) => {
-    const { 
-        categoria, ano_max, ano_min, 
-        ordem, direcao,
-        pagina = 1,      // Página padrão: 1
-        limite = 10     // Itens por página: 10
-    } = req.query;
-    
-    let resultado = conteudos;
-    
-    // ... aplicar filtros e ordenação ...
     
     // Paginação
     const paginaNum = parseInt(pagina);
     const limiteNum = parseInt(limite);
-    
     const inicio = (paginaNum - 1) * limiteNum;
-    const fim = inicio + limiteNum;
+    const paginado = resultado.slice(inicio, inicio + limiteNum);
     
-    const paginado = resultado.slice(inicio, fim);
-    
-    // Retornar com metadados
     res.json({
         dados: paginado,
         paginacao: {
@@ -242,4 +141,7 @@ app.get('/api/conteudos', (req, res) => {
         }
     });
 });
-      
+
+
+
+app.listen(5000, () => console.log('🚀 API rodando na porta 5000'));
