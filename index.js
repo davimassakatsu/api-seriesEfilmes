@@ -3,6 +3,7 @@ const app = express();
 
 app.use(express.json());
 
+
 // Dados em memória
 let conteudos = [
   {
@@ -142,6 +143,29 @@ app.get('/api/conteudos', (req, res) => {
     });
 });
 
+// POST /api/conteudos - Criar novo conteudo
+app.post('/api/conteudos', (req, res) => {
+    // 1. Pegar dados do body
+    const { titulo, diretor, ano, genero, nota } = req.body;
+    
+    //adicionar id de acordo com a posição do array
+    proximoId = conteudos.length +1;
 
+    // 2. Criar objeto do novo produto
+    const novoConteudo = {
+        id: proximoId++,    // Gera ID e incrementa
+        titulo,
+        diretor,
+        ano,
+        genero,
+        nota
+    };
+    
+    // 3. Adicionar ao array
+    conteudos.push(novoConteudo);
+    
+    // 4. Retornar conteudo criado com status 201
+    res.status(201).json(novoConteudo);
+});
 
 app.listen(5000, () => console.log('🚀 API rodando na porta 5000'));
