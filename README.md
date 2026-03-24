@@ -111,6 +111,23 @@ TOTAL DE ITENS - TESTE NAVEGADOR
 
 10 DO ARRAY + 5 ADICIONADOS = 15
 
+PUT
+
+ATUALIZAÇÃO DE ELEMENTO - TÍTULO
+<img width="977" height="946" alt="image" src="https://github.com/user-attachments/assets/7e08a93d-e91d-4c62-9048-9213900816f2" />
+
+ERRO DE ATUALIZAÇÃO - ID INEXISTENTE
+<img width="980" height="952" alt="image" src="https://github.com/user-attachments/assets/923bad05-04fd-4836-b1d6-888914d2e454" />
+
+ERRO DE ATUALIZAÇÃO - CAMPO VAZIO
+<img width="981" height="1000" alt="image" src="https://github.com/user-attachments/assets/4e356efd-c054-41fa-8301-34c434b630cb" />
+
+
+DELETE
+
+DELETAR ELEMENTO
+<img width="975" height="865" alt="image" src="https://github.com/user-attachments/assets/77604bc2-c60a-4a4a-9245-99f95b9ee006" />
+
 
 COLLECTION POSTMAN
 https://davimassakatsu-3157203.postman.co/workspace/Davi-Massakatsu's-Workspace~d443b077-e611-46f3-807c-bbaf060a55eb/collection/53421951-4a3523e7-f10e-4c75-a809-a43d726cdad3?action=share&source=copy-link&creator=53421951
