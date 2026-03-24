@@ -204,6 +204,21 @@ app.put('/api/conteudos/:id', (req, res) => {
     });
 });
 
+// DELETE /api/conteudos/:id - Remover
+app.delete('/api/conteudos/:id', (req, res) => {
+    const index = conteudos.findIndex(p => p.id === parseInt(req.params.id));
+    
+    if (index === -1) {
+        return res.status(404).json({ erro: "Não encontrado" });
+    }
+
+    const removido = conteudos.splice(index, 1);
+
+    res.json({
+        mensagem: "Removido com sucesso",
+        conteudo: removido[0]
+    });
+});
 
 
 app.listen(5000, () => console.log('🚀 API rodando na porta 5000'));
