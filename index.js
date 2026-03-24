@@ -88,7 +88,7 @@ let conteudos = [
   }
 ];
 
-// GET /api/produtos/:id - Buscar por ID
+// GET /api/conteudos/:id - Buscar por ID
 app.get('/api/conteudos/:id', (req, res) => {
     const conteudo = conteudos.find(c => c.id === parseInt(req.params.id));
 
@@ -99,7 +99,7 @@ app.get('/api/conteudos/:id', (req, res) => {
     res.json(conteudo);
 });
 
-// GET /api/produtos - Listar com filtros, ordenação e paginação
+// GET /api/conteudos - Listar com filtros, ordenação e paginação
 app.get('/api/conteudos', (req, res) => {
     const { categoria, ano_max, ano_min, nota_min, nota_max, ordem, direcao, pagina = 1, limite = 10 } = req.query;
     
@@ -149,9 +149,9 @@ app.post('/api/conteudos', (req, res) => {
     const { titulo, diretor, ano, genero, nota } = req.body;
     
     //adicionar id de acordo com a posição do array
-    proximoId = conteudos.length +1;
+    proximoId = conteudos.length + 1;
 
-    // 2. Criar objeto do novo produto
+    // 2. Criar objeto do novo conteudo
     const novoConteudo = {
         id: proximoId++,    // Gera ID e incrementa
         titulo,
@@ -167,6 +167,43 @@ app.post('/api/conteudos', (req, res) => {
     // 4. Retornar conteudo criado com status 201
     res.status(201).json(novoConteudo);
 });
+
+// PUT /api/conteudos/:id - Atualizar
+app.put('/api/conteudos/:id', (req, res) => {
+    const conteudo = conteudos.find(p => p.id === parseInt(req.params.id));
+    
+    if (!conteudo) {
+        return res.status(404).json({ erro: "Não encontrado" });
+    }
+
+    const { titulo, diretor, ano, genero, nota } = req.body;
+
+    //VALIDAÇÃO (campo vazio)
+    if (
+        titulo === "" ||
+        diretor === "" ||
+        genero === "" ||
+        ano === "" ||
+        nota === ""
+    ) {
+        return res.status(400).json({
+            erro: "Nenhum campo pode estar vazio"
+        });
+    }
+
+    // Atualiza apenas se vier
+    if (titulo !== undefined) conteudo.titulo = titulo;
+    if (diretor !== undefined) conteudo.diretor = diretor;
+    if (ano !== undefined) conteudo.ano = ano;
+    if (genero !== undefined) conteudo.genero = genero;
+    if (nota !== undefined) conteudo.nota = nota;
+
+    res.json({
+        mensagem: "Atualizado com sucesso",
+        conteudo
+    });
+});
+
 
 
 app.listen(5000, () => console.log('🚀 API rodando na porta 5000'));
